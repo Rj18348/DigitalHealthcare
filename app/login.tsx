@@ -93,8 +93,8 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
         <View style={styles.header}>
         <Text style={styles.title}>Digital Healthcare</Text>
         <Text style={styles.subtitle}>Sign in to your account</Text>
@@ -152,28 +152,28 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Don't have an account?{' '}
-          <Text
-            style={styles.linkText}
-            onPress={() => router.push('/signup')}
-          >
-            Sign Up
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text
+              style={styles.linkText}
+              onPress={() => router.push('/signup')}
+            >
+              Sign Up
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  container: {
+  content: {
     flex: 1,
     justifyContent: 'center',
     padding: 20,
