@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { auth, db } from '../src/services/firebase';
 import { setUser } from '../src/store/userSlice';
@@ -93,8 +93,9 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
         <Text style={styles.title}>Digital Healthcare</Text>
         <Text style={styles.subtitle}>Sign in to your account</Text>
       </View>
@@ -162,14 +163,18 @@ export default function LoginScreen() {
           </Text>
         </Text>
       </View>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  container: {
+    flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
