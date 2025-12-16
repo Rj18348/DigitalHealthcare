@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users Collection - Only authenticated users can read/write their own data
+    match /users/{userId} {
+      // Users can read and write their own profile
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // Admins can read all user profiles
+      allow read: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Appointments Collection - Role-based access control
+    match /appointments/{appointmentId} {
+      // Function to check if user is involved in appointment
+      function isAppointmentParticipant() {
+        return request.auth != null &&
+          (resource.data.patientId == request.auth.uid ||
+           resource.data.doctorId == request.auth.uid);
+      }
+
+      // Function to check if user is admin
+      function isAdmin() {
+        return request.auth != null &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      }
+
+      // Patients can read/write their own appointments
+      // Doctors can read/write appointments they're assigned to
+      // Admins can read all appointments
+      allow read: if isAppointmentParticipant() || isAdmin();
+
+      // Only patients can create appointments
+      // Doctors can update appointment status
+      allow create: if request.auth != null &&
+        request.auth.uid == resource.data.patientId;
+
+      allow update: if isAppointmentParticipant() || isAdmin();
+    }
+
+    // Medical Records Collection - Strict HIPAA compliance
+    match /medicalRecords/{recordId} {
+      // Function to check if user is authorized to access this record
+      function canAccessMedicalRecord() {
+        return request.auth != null &&
+          (resource.data.patientId == request.auth.uid ||
+           resource.data.doctorId == request.auth.uid ||
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      }
+
+      // Only authorized users can read medical records
+      allow read: if canAccessMedicalRecord();
+
+      // Only doctors can create medical records
+      allow create: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'doctor' &&
+        request.auth.uid == resource.data.doctorId;
+
+      // Doctors can update their own records, admins can update any
+      allow update: if canAccessMedicalRecord() &&
+        (request.auth.uid == resource.data.doctorId ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+
+      // Medical records should never be deleted (audit trail)
+      allow delete: if false;
+    }
+
+    // Payments Collection - Financial data protection
+    match /payments/{paymentId} {
+      // Only the patient and admins can view payment details
+      allow read: if request.auth != null &&
+        (resource.data.patientId == request.auth.uid ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+
+      // Only patients can create payments for their appointments
+      allow create: if request.auth != null &&
+        request.auth.uid == resource.data.patientId;
+
+      // Only admins can update payment status (for processing)
+      allow update: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Audit Logs Collection - Only admins can access
+    match /auditLogs/{logId} {
+      allow read, write: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Platform Settings - Admin only
+    match /settings/{settingId} {
+      allow read, write: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}

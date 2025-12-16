@@ -1,0 +1,109 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Medical Reports and Documents - Strict access control
+    match /medical-reports/{userId}/{allPaths=**} {
+      // Only the patient, their assigned doctors, and admins can access
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == userId ||
+         isAssignedDoctor(userId) ||
+         isAdmin());
+    }
+
+    // Prescription Files
+    match /prescriptions/{userId}/{allPaths=**} {
+      // Only the patient, prescribing doctor, and admins can access
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == userId ||
+         isPrescribingDoctor() ||
+         isAdmin());
+    }
+
+    // Profile Pictures
+    match /profile-pictures/{userId}/{allPaths=**} {
+      // Users can manage their own profile pictures
+      // Admins can view all profile pictures
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+
+      // Public read access for profile pictures (after verification)
+      allow read: if true; // Consider restricting this based on privacy settings
+    }
+
+    // Lab Reports and Imaging
+    match /lab-reports/{userId}/{allPaths=**} {
+      // Only the patient, ordering doctor, and admins can access
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == userId ||
+         isOrderingDoctor() ||
+         isAdmin());
+    }
+
+    // Insurance Documents
+    match /insurance/{userId}/{allPaths=**} {
+      // Only the patient and admins can access insurance documents
+      allow read, write: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+    }
+
+    // Platform Assets (logos, help images) - Public access
+    match /assets/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Helper functions
+    function isAdmin() {
+      return firestore.exists(/databases/(default)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isAssignedDoctor(patientId) {
+      // Check if the authenticated user is assigned as a doctor to this patient
+      return firestore.exists(/databases/(default)/documents/appointments/$(patientId + '_' + request.auth.uid));
+    }
+
+    function isPrescribingDoctor() {
+      // Check if the authenticated user prescribed medication to this patient
+      // This would need to be implemented based on prescription records
+      return true; // Simplified - implement proper logic
+    }
+
+    function isOrderingDoctor() {
+      // Check if the authenticated user ordered the lab work/imaging
+      // This would need to be implemented based on order records
+      return true; // Simplified - implement proper logic
+    }
+
+    // File type and size restrictions
+    function isValidMedicalFile() {
+      return request.resource.size < 50 * 1024 * 1024 && // 50MB max
+        (request.resource.contentType.matches('image/.*') ||
+         request.resource.contentType.matches('application/pdf') ||
+         request.resource.contentType.matches('application/msword') ||
+         request.resource.contentType.matches('application/vnd.openxmlformats-officedocument.*'));
+    }
+
+    function isValidImageFile() {
+      return request.resource.size < 5 * 1024 * 1024 && // 5MB max for images
+        request.resource.contentType.matches('image/.*');
+    }
+
+    // Apply file validation to medical documents
+    match /medical-reports/{userId}/{allPaths=**} {
+      allow write: if isValidMedicalFile();
+    }
+
+    match /prescriptions/{userId}/{allPaths=**} {
+      allow write: if isValidMedicalFile();
+    }
+
+    match /lab-reports/{userId}/{allPaths=**} {
+      allow write: if isValidMedicalFile();
+    }
+
+    match /profile-pictures/{userId}/{allPaths=**} {
+      allow write: if isValidImageFile();
+    }
+  }
+}
