@@ -45,5 +45,15 @@
       "typedRoutes": true,
       "reactCompiler": true
     }
+    ,
+    "extra": {
+      "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCf1fy4x85DX82ch94WzArzvw6qKC-zpVI",
+      "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "digihealth-di.firebaseapp.com",
+      "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "digihealth-di",
+      "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "digihealth-di.firebasestorage.app",
+      "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "841652395146",
+      "EXPO_PUBLIC_FIREBASE_APP_ID": "1:841652395146:web:35f8cb2d36207ef52f2173",
+      "EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID": "G-H0VN7SPN1Y"
+    }
   }
 }

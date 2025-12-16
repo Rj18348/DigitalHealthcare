@@ -22,7 +22,7 @@ import { Doctor, Appointment } from '../types';
 // Zod validation schema
 const appointmentSchema = z.object({
   doctorId: z.string().min(1, 'Please select a doctor'),
-  appointmentDate: z.date().refine((date) => date > new Date(), 'Appointment date must be in the future'),
+  appointmentDate: z.date().refine((date: Date) => date > new Date(), 'Appointment date must be in the future'),
   appointmentType: z.enum(['consultation', 'follow-up', 'emergency']),
   notes: z.string().optional(),
 });
@@ -124,7 +124,7 @@ const BookAppointment: React.FC = () => {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedDoctor}
-            onValueChange={(itemValue) => setSelectedDoctor(itemValue)}
+            onValueChange={(itemValue: string) => setSelectedDoctor(itemValue)}
             style={styles.picker}
           >
             <Picker.Item label="Choose a doctor..." value="" />
@@ -165,7 +165,7 @@ const BookAppointment: React.FC = () => {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={appointmentType}
-            onValueChange={(value) => setAppointmentType(value)}
+            onValueChange={(value: 'consultation' | 'follow-up' | 'emergency') => setAppointmentType(value)}
             style={styles.picker}
           >
             <Picker.Item label="Consultation" value="consultation" />

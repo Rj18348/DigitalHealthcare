@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { Appointment } from '../../types';
 
 const Appointments: React.FC = () => {
-  const appointments = []; // Will be populated from Redux store
+  const appointments: Appointment[] = []; // Will be populated from Redux store
 
   return (
     <View style={styles.container}>
@@ -18,8 +19,8 @@ const Appointments: React.FC = () => {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.appointmentCard}>
-              <Text style={styles.doctorName}>{item.doctorName}</Text>
-              <Text style={styles.appointmentDate}>{item.date}</Text>
+              <Text style={styles.doctorName}>{item.doctorId}</Text>
+              <Text style={styles.appointmentDate}>{item.date.toLocaleString()}</Text>
               <Text style={styles.status}>{item.status}</Text>
             </View>
           )}
