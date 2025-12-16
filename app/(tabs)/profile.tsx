@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { auth } from '../../src/services/firebase';
 import { RootState } from '../../src/store';
 import { logout } from '../../src/store/userSlice';
+import { SecureStorage } from '../../src/utils/security';
 
 export default function ProfileScreen() {
   const user = useSelector((state: RootState) => state.user);
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
           onPress: async () => {
             try {
               await signOut(auth);
+              await SecureStorage.clearAll();
               dispatch(logout());
               router.replace('/login');
             } catch (error) {

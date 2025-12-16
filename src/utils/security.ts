@@ -1,5 +1,5 @@
-import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 
 // Secure Storage Keys
 const STORAGE_KEYS = {
@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   USER_ID: 'userId',
   BIOMETRIC_ENABLED: 'biometricEnabled',
   ENCRYPTION_KEY: 'encryptionKey',
+  USER_DATA: 'userData',
 } as const;
 
 // Secure Storage Operations
@@ -57,8 +58,34 @@ export class SecureStorage {
       await SecureStore.deleteItemAsync(STORAGE_KEYS.USER_ID);
       await SecureStore.deleteItemAsync(STORAGE_KEYS.BIOMETRIC_ENABLED);
       await SecureStore.deleteItemAsync(STORAGE_KEYS.ENCRYPTION_KEY);
+      await SecureStore.deleteItemAsync(STORAGE_KEYS.USER_DATA);
     } catch (error) {
       console.error('Error clearing secure storage:', error);
+    }
+  }
+
+  static async saveUserData(userData: any): Promise<void> {
+    try {
+      await SecureStore.setItemAsync(
+        STORAGE_KEYS.USER_DATA,
+        JSON.stringify(userData),
+        {
+          keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
+        }
+      );
+    } catch (error) {
+      console.error('Error saving user data:', error);
+      throw new Error('Failed to save user data');
+    }
+  }
+
+  static async getUserData(): Promise<any | null> {
+    try {
+      const data = await SecureStore.getItemAsync(STORAGE_KEYS.USER_DATA);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+      return null;
     }
   }
 

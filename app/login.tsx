@@ -63,6 +63,7 @@ export default function LoginScreen() {
         // Store sensitive data securely
         await SecureStorage.saveAuthToken(await userCredential.user.getIdToken());
         await SecureStorage.saveUserId(userCredential.user.uid);
+        await SecureStorage.saveUserData(userData);
 
         // Log access for HIPAA compliance
         HIPAACompliance.logDataAccess(
