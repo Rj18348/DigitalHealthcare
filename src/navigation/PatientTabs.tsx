@@ -7,14 +7,8 @@ import { View, Text } from 'react-native';
 import PatientDashboard from '../screens/patient/Dashboard';
 import AppointmentScreen from '../screens/patient/Appointments';
 import RecordsScreen from '../screens/patient/Records';
+import AlertsScreen from '../screens/patient/Alerts';
 import SettingsScreen from '../screens/patient/Settings';
-
-// AlertsScreen যদি এখনও না বানিয়ে থাকেন, তবে একটি টেম্পোরারি কম্পোনেন্ট দিয়ে রাখছি
-const PlaceholderAlerts = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>🔔 No new alerts!</Text>
-  </View>
-);
 
 const Tab = createBottomTabNavigator();
 
@@ -71,7 +65,7 @@ const PatientTabs = () => {
       />
       <Tab.Screen
         name="Alerts"
-        component={PlaceholderAlerts} // এখানে আপনার AlertsScreen দিন
+        component={AlertsScreen}
         options={{ title: 'Alerts' }}
       />
       <Tab.Screen
