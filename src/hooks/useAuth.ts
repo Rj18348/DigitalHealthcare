@@ -1,3 +1,4 @@
+// @ts-ignore
 import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -20,7 +21,7 @@ export const useAuth = (): AuthState => {
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
       if (firebaseUser) {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));

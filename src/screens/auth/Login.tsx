@@ -1,3 +1,4 @@
+// @ts-ignore
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';

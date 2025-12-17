@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+// @ts-ignore
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
