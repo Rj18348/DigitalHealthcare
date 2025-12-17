@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, Switch } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
 import { auth, db } from '../src/services/firebase';
 import { setUser } from '../src/store/userSlice';
-import { SecureStorage, BiometricAuth, HIPAACompliance } from '../src/utils/security';
-import { router } from 'expo-router';
+import { BiometricAuth, HIPAACompliance, SecureStorage } from '../src/utils/security';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -63,6 +64,7 @@ export default function LoginScreen() {
         // Store sensitive data securely
         await SecureStorage.saveAuthToken(await userCredential.user.getIdToken());
         await SecureStorage.saveUserId(userCredential.user.uid);
+        await SecureStorage.saveUserData(userData);
 
         // Log access for HIPAA compliance
         HIPAACompliance.logDataAccess(
@@ -79,8 +81,8 @@ export default function LoginScreen() {
           isLoggedIn: true,
           profileComplete: true,
         }));
-
-        // Navigation will be handled by the AuthGuard in _layout.tsx
+          // Navigation: replace login with the app root so layout shows tabs
+          router.replace('/');
       } else {
         Alert.alert('Error', 'User profile not found');
       }
@@ -93,8 +95,9 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.header}>
         <Text style={styles.title}>Digital Healthcare</Text>
         <Text style={styles.subtitle}>Sign in to your account</Text>
       </View>
@@ -151,12 +154,19 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Don't have an account? Contact administrator
-        </Text>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Don't have an account?{' '}
+            <Text
+              style={styles.linkText}
+              onPress={() => router.push('/signup')}
+            >
+              Sign Up
+            </Text>
+          </Text>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -164,6 +174,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     padding: 20,
   },
@@ -242,5 +255,9 @@ const styles = StyleSheet.create({
   footerText: {
     color: '#666',
     fontSize: 14,
+  },
+  linkText: {
+    color: '#007AFF',
+    fontWeight: '600',
   },
 });
